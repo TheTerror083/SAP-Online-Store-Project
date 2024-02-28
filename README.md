@@ -1,5 +1,6 @@
 SAP ABAP online store. utilizes both client and server sides. Grade 105.
 
+Error popups displayed are stored in a message class.
 Translated to both Hebrew and English.
 
 Supports adding, updating and removing clients, orders and products. can be done with single or multiple entities at once.
