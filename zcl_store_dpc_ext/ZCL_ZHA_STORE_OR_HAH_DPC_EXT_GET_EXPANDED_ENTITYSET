@@ -1,0 +1,44 @@
+  method /IWBEP/IF_MGW_APPL_SRV_RUNTIME~GET_EXPANDED_ENTITYSET.
+
+    DATA: lt_filter                  TYPE /iwbep/t_mgw_select_option,
+          lt_client_full_name_filter TYPE /iwbep/t_cod_select_options,
+          lt_client_id_filter        TYPE /iwbep/t_cod_select_options,
+          lt_phone_number_filter     TYPE /iwbep/t_cod_select_options,
+          lt_result                  type zstore_or_hah=>ztt_orders_of_clients,
+          lt_clients                 type STANDARD TABLE OF zcl_zha_store_or_hah_mpc=>ts_client with DEFAULT KEY.
+
+    DATA(lo_filter) = io_tech_request_context->get_filter( ).
+    lt_filter = lo_filter->get_filter_select_options( ).
+
+    LOOP AT lt_filter ASSIGNING FIELD-SYMBOL(<ls_filter>).
+      CASE <ls_filter>-property.
+        WHEN 'CLIENT_FULL_NAME'.
+          lt_client_full_name_filter = <ls_filter>-select_options.
+        WHEN 'CLIENT_ID'.
+          lt_client_id_filter = <ls_filter>-select_options.
+        WHEN 'PHONE_NUMBER'.
+          lt_phone_number_filter = <ls_filter>-select_options.
+      ENDCASE.
+    ENDLOOP.
+
+    CASE iv_entity_name.
+  WHEN zcl_zha_store_or_hah_mpc=>gc_client.
+
+CALL METHOD zstore_or_hah=>associate_multi_client_orders
+  EXPORTING
+    it_client_id_filter        = lt_client_id_filter
+    it_client_full_name_filter = lt_client_full_name_filter
+    it_phone_number_filter     = lt_phone_number_filter
+  IMPORTING
+    et_clients_and_orders      = lt_result
+    .
+
+
+     copy_data_to_ref(
+       EXPORTING
+         is_data = lt_result
+       CHANGING
+         cr_data = er_entityset
+     ).
+ENDCASE.
+  endmethod.

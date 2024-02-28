@@ -1,0 +1,20 @@
+  method CLIENTSET_UPDATE_ENTITY.
+
+DATA: ls_entity type zcl_zha_store_or_hah_mpc_ext=>ts_client,
+      lt_entity type zcl_zha_store_or_hah_mpc_ext=>tt_client. "TODO: send the table to update function.
+
+io_data_provider->read_entry_data(
+  IMPORTING
+    es_data                      = ls_entity
+).
+
+CALL METHOD zstore_or_hah=>update_store_table
+  EXPORTING
+    is_client        =     ls_entity
+*    it_client_table  =     " Table type for Clients table.
+  .
+
+  er_entity = ls_entity.
+
+
+  endmethod.

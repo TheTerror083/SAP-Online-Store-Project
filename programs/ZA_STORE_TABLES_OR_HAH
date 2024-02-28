@@ -1,0 +1,166 @@
+*&---------------------------------------------------------------------*
+*& Report ZA_STORE_TABLES_OR_HAH
+*&---------------------------------------------------------------------*
+*&
+*&---------------------------------------------------------------------*
+REPORT ZA_STORE_TABLES_OR_HAH.
+
+DATA: lt_clients_table TYPE STANDARD TABLE OF zclients_or_hah,
+      lt_product_table TYPE STANDARD TABLE OF zproducts_or_hah,
+      lt_orders_table  TYPE STANDARD TABLE OF zorders_or_hah,
+      ls_order TYPE zsa_order_or_hah,
+      ls_client TYPE ZSA_client_or_hah,
+      ls_product TYPE zsa_product_or_hah.
+
+*
+*lt_clients_table = VALUE #(
+*                    ( client_id = 2115860  client_full_name =  'Cora Orozcoy'         phone_number =  '0526003991' )
+*                    ( client_id = 8234276  client_full_name =  'Hayley Yu'            phone_number =  '0508125595' )
+*                    ( client_id = 7941138  client_full_name =  'Zane Malone'          phone_number =  '0548097016' )
+*                    ( client_id = 6981757  client_full_name =  'Ian Newman'           phone_number =  '0533236140' )
+*                    ( client_id = 3918069  client_full_name =  'Brady Bridges'        phone_number =  '0521329174' )
+*                    ( client_id = 1047963  client_full_name =  'Emery Bird'           phone_number =  '0527155237' )
+*                    ( client_id = 7140505  client_full_name =  'Erik Estrada'         phone_number =  '0501820230' )
+*                    ( client_id = 4850553  client_full_name =  'Madilynn Berg'        phone_number =  '0545251207' )
+*                    ( client_id = 5249554  client_full_name =  'Grant Frey'           phone_number =  '0539292720' )
+*                    ( client_id = 4437895  client_full_name =  'Matilda Barajas'      phone_number =  '0527174051' )
+*                    ( client_id = 1410798  client_full_name =  'Immanuel Cline'       phone_number =  '0528495631' )
+*                    ( client_id = 4685297  client_full_name =  'Weston Dickson'       phone_number =  '0508508796' )
+*                    ( client_id = 5414666  client_full_name =  'Arielle Mann'         phone_number =  '0546325218' )
+*                    ( client_id = 8167296  client_full_name =  'Chance Brennan'       phone_number =  '0533753588' )
+*                    ( client_id = 2996667  client_full_name =  'Jenna Carlson'        phone_number =  '0523645719' )
+*                    ( client_id = 3937595  client_full_name =  'Siena Fuentes'        phone_number =  '0525087695' )
+*                    ( client_id = 3104074  client_full_name =  'Angie Hickman'        phone_number =  '0508693977' )
+*                    ( client_id = 2928087  client_full_name =  'Rafael Burton'        phone_number =  '0545729897' )
+*                    ( client_id = 9358768  client_full_name =  'Cody Cole'            phone_number =  '0532161237' )
+*                    ( client_id = 1867400  client_full_name =  'Sammy Perez'          phone_number =  '0528284060' )
+*                    ( client_id = 1546912  client_full_name =  'Boston Johnson'       phone_number =  '0529831374' )
+*                    ( client_id = 1648773  client_full_name =  'Jayvon Thompson'      phone_number =  '0502262013' )
+*                    ( client_id = 6093942  client_full_name =  'Paisley Mullins'      phone_number =  '0549576809' )
+*                    ( client_id = 5910858  client_full_name =  'Alondra Moran'        phone_number =  '0538167770' )
+*                    ( client_id = 1096791  client_full_name =  'Sandra Bentley'       phone_number =  '0528871016' )
+*                    ( client_id = 4615672  client_full_name =  'Isla Boyer'           phone_number =  '0522466912' )
+*                    ( client_id = 1007991  client_full_name =  'Ryland Mathews'       phone_number =  '0504535425' )
+*                    ( client_id = 6970120  client_full_name =  'Richard Sexton'       phone_number =  '0542857307' )
+*                    ( client_id = 3738886  client_full_name =  'Justine Mejia'        phone_number =  '0538159863' )
+*                    ( client_id = 5590662  client_full_name =  'Perla Booth'          phone_number =  '0526661122' )
+*                    ( client_id = 5506063  client_full_name =  'Amanda Holden'        phone_number =  '0521595850' )
+*                    ( client_id = 3631587  client_full_name =  'Eliana Ortega'        phone_number =  '0508082944' )
+*                    ( client_id = 5271465  client_full_name =  'Lillie Haynes'        phone_number =  '0542069640' )
+*                    ( client_id = 3284918  client_full_name =  'Davian Reilly'        phone_number =  '0533704917' )
+*                    ( client_id = 6447986  client_full_name =  'Devyn Mercado'        phone_number =  '0529352903' )
+*                    ( client_id = 7907627  client_full_name =  'Savannah Murphy'      phone_number =  '0526547191' )
+*                    ( client_id = 3382693  client_full_name =  'Dulce Chaney'         phone_number =  '0507047795' )
+*                    ( client_id = 8296294  client_full_name =  'Conor Ray'            phone_number =  '0542499438' )
+*                    ( client_id = 4033086  client_full_name =  'Marina Rivers'        phone_number =  '0539669695' )
+*                    ( client_id = 6720171  client_full_name =  'Reynaldo Hayes'       phone_number =  '0522554797' )
+*                    ( client_id = 4018979  client_full_name =  'Pierce Mann'          phone_number =  '0528016157' )
+*                    ( client_id = 1199901  client_full_name =  'Marcel Krueger'       phone_number =  '0502135060' )
+*                    ( client_id = 2337543  client_full_name =  'Thomas Perkins'       phone_number =  '0542230799' )
+*                    ( client_id = 6429361  client_full_name =  'Caiden Zamora'        phone_number =  '0538361079' )
+*                    ( client_id = 6089905  client_full_name =  'Paul Mejia'           phone_number =  '0524597487' )
+*                    ( client_id = 3557434  client_full_name =  'Camron Haas'          phone_number =  '0523745678' )
+*                    ( client_id = 9512309  client_full_name =  'Gunnar Simon'         phone_number =  '0508263243' )
+*                    ( client_id = 8481109  client_full_name =  'Arjun Hudson'         phone_number =  '0543615451' )
+*                    ( client_id = 3846526  client_full_name =  'Diego Navarro'        phone_number =  '0533461688' )
+*                    ( client_id = 5920032  client_full_name =  'Evangeline Camacho'   phone_number =  '0524748628' )
+*                  ).
+*
+*lt_product_table = VALUE #(
+*                         ( product_id = '3035841075'   product_price =  '5594'   quantity_amount =  147      product_name =  'candy wrapper'            )
+*                         ( product_id = '8196425433'   product_price =  '4468'   quantity_amount =  527      product_name =  'tea cup'                  )
+*                         ( product_id = '1967449116'   product_price =  '6873'   quantity_amount =  413      product_name =  'butter knife'             )
+*                         ( product_id = '1384693002'   product_price =  '7185'   quantity_amount =  90       product_name =  'plush rabbit'             )
+*                         ( product_id = '5310964798'   product_price =  '2625'   quantity_amount =  654      product_name =  'belt'                     )
+*                         ( product_id = '9693875759'   product_price =  '2755'   quantity_amount =  616      product_name =  'empty bottle'             )
+*                         ( product_id = '1455682103'   product_price =  '6131'   quantity_amount =  906      product_name =  'lace'                     )
+*                         ( product_id = '8243845330'   product_price =  '4045'   quantity_amount =  310      product_name =  'hand fan'                 )
+*                         ( product_id = '8792842996'   product_price =  '5087'   quantity_amount =  873      product_name =  'bottle of honey'          )
+*                         ( product_id = '1624922523'   product_price =  '5736'   quantity_amount =  530      product_name =  'tiger'                    )
+*                         ( product_id = '9387263444'   product_price =  '5767'   quantity_amount =  659      product_name =  'magazine'                 )
+*                         ( product_id = '9444707696'   product_price =  '8291'   quantity_amount =  456      product_name =  'soap'                     )
+*                         ( product_id = '1232311588'   product_price =  '5057'   quantity_amount =  856      product_name =  'incense holder'           )
+*                         ( product_id = '5125375347'   product_price =  '2208'   quantity_amount =  581      product_name =  'giraffe'                  )
+*                         ( product_id = '8699378244'   product_price =  '6511'   quantity_amount =  589      product_name =  'glow stick'               )
+*                         ( product_id = '9302101294'   product_price =  '9858'   quantity_amount =  221      product_name =  'sheep'                    )
+*                         ( product_id = '5118932404'   product_price =  '9537'   quantity_amount =  454      product_name =  'bottle of nail polish'    )
+*                         ( product_id = '4641434544'   product_price =  '4375'   quantity_amount =  155      product_name =  'safety pin'               )
+*                         ( product_id = '8591671578'   product_price =  '6178'   quantity_amount =  437      product_name =  'buckle'                   )
+*                         ( product_id = '3059838400'   product_price =  '9034'   quantity_amount =  906      product_name =  'pair of knitting needles' )
+*                         ( product_id = '3272245896'   product_price =  '6811'   quantity_amount =  308      product_name =  'thermometer'              )
+*                         ( product_id = '6758334596'   product_price =  '7767'   quantity_amount =  360      product_name =  'children book'            )
+*                         ( product_id = '6765192898'   product_price =  '8328'   quantity_amount =  188      product_name =  'sheet of paper'           )
+*                         ( product_id = '6060229308'   product_price =  '2459'   quantity_amount =  510      product_name =  'mouse pad'                )
+*                         ( product_id = '9069356928'   product_price =  '3729'   quantity_amount =  989      product_name =  'bottle of soda'           )
+*                         ( product_id = '7201021393'   product_price =  '8093'   quantity_amount =  725      product_name =  'model car'                )
+*                         ( product_id = '3748899576'   product_price =  '6520'   quantity_amount =  821      product_name =  'ipod'                     )
+*                         ( product_id = '9602646873'   product_price =  '4777'   quantity_amount =  5        product_name =  'pair of tongs'            )
+*                         ( product_id = '9422830819'   product_price =  '3260'   quantity_amount =  4        product_name =  'chair'                    )
+*                         ( product_id = '2558811062'   product_price =  '6679'   quantity_amount =  5        product_name =  'water'                    )
+*                         ( product_id = '5147979069'   product_price =  '4841'   quantity_amount =  906      product_name =  'coffee mug'               )
+*                         ( product_id = '9337746184'   product_price =  '5485'   quantity_amount =  608      product_name =  'rubber duck'              )
+*                         ( product_id = '5681257373'   product_price =  '3446'   quantity_amount =  469      product_name =  'canteen'                  )
+*                         ( product_id = '2348229855'   product_price =  '4819'   quantity_amount =  210      product_name =  'jar of peanut butter'     )
+*                         ( product_id = '9766379972'   product_price =  '5021'   quantity_amount =  446      product_name =  'craft book'               )
+*                         ( product_id = '6502387925'   product_price =  '2349'   quantity_amount =  807      product_name =  'handful of change'        )
+*                         ( product_id = '9818435501'   product_price =  '5838'   quantity_amount =  610      product_name =  'Christmas ornament'       )
+*                         ( product_id = '9526498464'   product_price =  '3841'   quantity_amount =  554      product_name =  'eye liner'                )
+*                         ( product_id = '5722602485'   product_price =  '6310'   quantity_amount =  613      product_name =  'CD'                       )
+*                         ( product_id = '4253698875'   product_price =  '4937'   quantity_amount =  524      product_name =  'trucks'                   )
+*                         ( product_id = '8207113961'   product_price =  '4113'   quantity_amount =  403      product_name =  'outlet'                   )
+*                         ( product_id = '2243176732'   product_price =  '4332'   quantity_amount =  213      product_name =  'tv'                       )
+*                         ( product_id = '2518681519'   product_price =  '3333'   quantity_amount =  445      product_name =  'matchbook'                )
+*                         ( product_id = '1302007083'   product_price =  '9658'   quantity_amount =  967      product_name =  'bar of soap'              )
+*                         ( product_id = '1105504599'   product_price =  '4867'   quantity_amount =  315      product_name =  'spectacles'               )
+*                         ( product_id = '1697450522'   product_price =  '6217'   quantity_amount =  323      product_name =  'wishbone'                 )
+*                         ( product_id = '1458696490'   product_price =  '6409'   quantity_amount =  208      product_name =  'dog'                      )
+*                         ( product_id = '8851617313'   product_price =  '2104'   quantity_amount =  163      product_name =  'can of beans'             )
+*                         ( product_id = '4375731381'   product_price =  '6343'   quantity_amount =  434      product_name =  'empty jar'                )
+*                         ( product_id = '4004702714'   product_price =  '7705'   quantity_amount =  919      product_name =  'car'                      )
+*                       ).
+*
+
+*lt_orders_table = value #(
+*                          ( client_id = 1648773 product_id = '9069356928' amount = 17 order_date = '20230516' )
+*                          ( client_id = 3937595 product_id = '8207113961' amount = 45 order_date = '20230918' )
+*                          ).
+
+
+*lt_clients_table = VALUE #(
+*                    ( client_id = 1000001  client_full_name =  'Irma Pizdets'    phone_number =  '0533461677' )
+*                    ( client_id = 1000002  client_full_name =  'Igal Boomboom'   phone_number =  '0524748629' )
+*                      ).
+
+
+
+CALL METHOD ZSTORE_OR_HAH=>GET_CLIENTS_WHO_ORDERED
+  IMPORTING
+    ET_ORDERING_CLIENTS = LT_CLIENTS_TABLE.
+
+CALL METHOD ZSTORE_OR_HAH=>GET_CLIENTS_BY_PHONE
+  IMPORTING
+    ET_CLIENTS = LT_CLIENTS_TABLE.
+
+
+
+  types:
+    BEGIN OF zsa_total_cost_calc2,
+          client_full_name TYPE za_client_full_name_or_hah,
+          total_cost       TYPE za_product_price_or_hah,
+         END OF zsa_total_cost_calc2.
+
+* NOTE:  the table and table type for the returning result were made in the CLASS ITSELF (under "types" tab).
+*          Just for the challenge.
+
+data ZTT_TOTAL_COST_CALC2 type STANDARD TABLE OF zsa_total_cost_calc2.
+CALL METHOD ZSTORE_OR_HAH=>get_buyers_and_costs
+  IMPORTING
+     ET_RESULT = ZTT_TOTAL_COST_CALC2.
+
+
+
+
+IF 1 = 1.
+
+ENDIF.
+    .

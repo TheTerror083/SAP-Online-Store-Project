@@ -1,0 +1,690 @@
+class ZSTORE_OR_HAH definition
+  public
+  final
+  create public .
+
+public section.
+
+  types:
+    BEGIN OF ZSA_ORDERS_OF_CLIENT .
+      INCLUDE TYPE zcl_zha_store_or_hah_mpc=>ts_client.
+  TYPES: orders TYPE STANDARD TABLE OF zcl_zha_store_or_hah_mpc=>ts_order with DEFAULT KEY,
+  END OF ZSA_ORDERS_OF_CLIENT .
+  types:
+    ZTT_ORDERS_OF_CLIENTS TYPE STANDARD TABLE OF ZSA_ORDERS_OF_CLIENT .
+  types:
+    BEGIN OF zsa_total_cost_calc,
+          client_full_name TYPE za_client_full_name_or_hah,
+          total_cost       TYPE za_product_price_or_hah,
+         END OF zsa_total_cost_calc .
+  types:
+    ZTT_TOTAL_COST_CALC type STANDARD TABLE OF zsa_total_cost_calc .
+
+  class-methods INSERT_TO_STORE_TABLE
+    importing
+      !IS_CLIENT type ZSA_CLIENT_OR_HAH optional
+      !IS_PRODUCT type ZSA_PRODUCT_OR_HAH optional
+      !IS_ORDER type ZSA_ORDER_OR_HAH optional
+      !IT_CLIENT_TABLE type ZTT_CLIENT_OR_HAH optional
+      !IT_PRODUCT_TABLE type ZTT_PRODUCT_OR_HAH optional
+      !IT_ORDER_TABLE type ZTT_ORDER_OR_HAH optional .
+  class-methods DELETE_FROM_STORE_TABLE
+    importing
+      !IS_CLIENT type ZSA_CLIENT_OR_HAH optional
+      !IS_PRODUCT type ZSA_PRODUCT_OR_HAH optional
+      !IS_ORDER type ZSA_ORDER_OR_HAH optional
+      !IT_CLIENT_TABLE type ZTT_CLIENT_OR_HAH optional
+      !IT_PRODUCT_TABLE type ZTT_PRODUCT_OR_HAH optional
+      !IT_ORDER_TABLE type ZTT_ORDER_OR_HAH optional .
+  class-methods UPDATE_STORE_TABLE
+    importing
+      !IS_CLIENT type ZSA_CLIENT_OR_HAH optional
+      !IS_PRODUCT type ZSA_PRODUCT_OR_HAH optional
+      !IS_ORDER type ZSA_ORDER_OR_HAH optional
+      !IT_CLIENT_TABLE type ZTT_CLIENT_OR_HAH optional
+      !IT_PRODUCT_TABLE type ZTT_PRODUCT_OR_HAH optional
+      !IT_ORDER_TABLE type ZTT_ORDER_OR_HAH optional .
+  class-methods ADD_NEW_CLIENT
+    importing
+      !IV_FULL_NAME type ZA_CLIENT_FULL_NAME_OR_HAH
+      !IV_PHONE_NUMBER type ZA_PHONE_NUMBER_OR_HAH .
+  class-methods ADD_NEW_ORDER
+    importing
+      !IV_CLIENT_ID type ZA_CLIENT_ID_OR_HAH
+      !IV_PRODUCT_ID type ZA_PRODUCT_ID_OR_HAH
+      !IV_AMOUNT type ZA_QUANTITY_AMOUNT_OR_HAH .
+  class-methods GET_CLIENTS_WHO_ORDERED
+    exporting
+      !ET_ORDERING_CLIENTS type ZTT_CLIENT_OR_HAH .
+  class-methods GET_CLIENTS_BY_PHONE
+    exporting
+      !ET_CLIENTS type ZTT_CLIENT_OR_HAH .
+  class-methods GET_BUYERS_AND_COSTS
+    exporting
+      !ET_RESULT type ZTT_TOTAL_COST_CALC .
+  class-methods GET_CLIENT_BY_ID
+    importing
+      !IV_CLIENT_ID type ZA_CLIENT_ID_OR_HAH
+    exporting
+      !ES_CLIENT type ZSA_CLIENT_OR_HAH .
+  class-methods GET_ORDER_OF_CLIENT
+    importing
+      !IV_CLIENT_ID type ZA_CLIENT_ID_OR_HAH
+      !IV_PRODUCT_ID type ZA_PRODUCT_ID_OR_HAH
+    exporting
+      !ES_ORDER type ZSA_ORDER_OR_HAH .
+  class-methods GET_PRODUCT_BY_ID
+    importing
+      !IV_PRODUCT_ID type ZA_PRODUCT_ID_OR_HAH
+    exporting
+      !ES_PRODUCT type ZSA_PRODUCT_OR_HAH .
+  class-methods GET_ALL_CLIENTS
+    importing
+      !IT_CLIENT_FULL_NAME_FILTER type /IWBEP/T_COD_SELECT_OPTIONS optional
+      !IT_CLIENT_ID_FILTER type /IWBEP/T_COD_SELECT_OPTIONS optional
+      !IT_PHONE_NUMBER_FILTER type /IWBEP/T_COD_SELECT_OPTIONS optional
+    exporting
+      !ET_CLIENTS type ZTT_CLIENT_OR_HAH .
+  class-methods GET_ALL_PRODUCTS
+    importing
+      !IT_PRODUCT_ID_FILTER type /IWBEP/T_COD_SELECT_OPTIONS optional
+      !IT_PRODUCT_NAME_FILTER type /IWBEP/T_COD_SELECT_OPTIONS optional
+      !IT_PRODUCT_PRICE_FILTER type /IWBEP/T_COD_SELECT_OPTIONS optional
+      !IT_QUANTITY_AMOUNT_FILTER type /IWBEP/T_COD_SELECT_OPTIONS optional
+    exporting
+      !ET_PRODUCTS type ZTT_PRODUCT_OR_HAH .
+  class-methods GET_ALL_ORDERS
+    importing
+      !IT_CLIENT_ID_FILTER type /IWBEP/T_COD_SELECT_OPTIONS optional
+      !IT_PRODUCT_ID_FILTER type /IWBEP/T_COD_SELECT_OPTIONS optional
+      !IT_AMOUNT_FILTER type /IWBEP/T_COD_SELECT_OPTIONS optional
+      !IT_ORDER_DATE_FILTER type /IWBEP/T_COD_SELECT_OPTIONS optional
+    exporting
+      !ET_ORDERS type ZTT_ORDER_OR_HAH .
+  class-methods CALCULATE_2_NUMS
+    importing
+      !IV_NUM1 type I
+      !IV_NUM2 type I
+      !IV_OP type STRING
+    exporting
+      !EV_RES type I
+      !EV_MESSAGE type STRING .
+  class-methods GET_ORDERS_BY_CLIENT_ID
+    importing
+      !IV_CLIENT_ID type ZA_CLIENT_ID_OR_HAH
+    exporting
+      !ET_ORDERS type ZTT_ORDER_OR_HAH .
+  class-methods ASSOCIATE_ORDERS_FOR_CLIENT
+    importing
+      !IV_CLIENT_ID type ZA_CLIENT_ID_OR_HAH
+    exporting
+      !ES_CLIENT_ORDERS type ZSA_ORDERS_OF_CLIENT .
+  class-methods ASSOCIATE_MULTI_CLIENT_ORDERS
+    importing
+      !IT_CLIENT_ID_FILTER type /IWBEP/T_COD_SELECT_OPTIONS optional
+      !IT_CLIENT_FULL_NAME_FILTER type /IWBEP/T_COD_SELECT_OPTIONS optional
+      !IT_PHONE_NUMBER_FILTER type /IWBEP/T_COD_SELECT_OPTIONS optional
+    exporting
+      !ET_CLIENTS_AND_ORDERS type ZTT_ORDERS_OF_CLIENTS .
+protected section.
+private section.
+ENDCLASS.
+
+
+
+CLASS ZSTORE_OR_HAH IMPLEMENTATION.
+
+
+* <SIGNATURE>---------------------------------------------------------------------------------------+
+* | Static Public Method ZSTORE_OR_HAH=>ADD_NEW_CLIENT
+* +-------------------------------------------------------------------------------------------------+
+* | [--->] IV_FULL_NAME                   TYPE        ZA_CLIENT_FULL_NAME_OR_HAH
+* | [--->] IV_PHONE_NUMBER                TYPE        ZA_PHONE_NUMBER_OR_HAH
+* +--------------------------------------------------------------------------------------</SIGNATURE>
+  method ADD_NEW_CLIENT.
+    DATA: ls_client TYPE ZSA_CLIENT_OR_HAH,
+          is_available TYPE ABAP_BOOL,
+          iv_random_id TYPE i.
+
+    WHILE is_available = abap_false.
+      CALL FUNCTION 'QF05_RANDOM_INTEGER' "Generate a random number for the client's id.
+       EXPORTING
+         RAN_INT_MAX         = 9999999
+         RAN_INT_MIN         = 1000000
+       IMPORTING
+         RAN_INT             = iv_random_id
+       EXCEPTIONS
+         INVALID_INPUT       = 1
+         OTHERS              = 2
+                .
+      IF SY-SUBRC <> 0.
+*   Implement suitable error handling here
+      ENDIF.
+      SELECT SINGLE * FROM zclients_or_hah as client
+        where client~client_id = @iv_random_id INTO CORRESPONDING FIELDS OF @ls_client.
+        IF ls_client is INITIAL.
+            ls_client-client_id = iv_random_id.
+            ls_client-client_full_name = iv_full_name.
+            ls_client-phone_number = iv_phone_number.
+            INSERT zclients_or_hah FROM ls_client.
+            is_available = abap_true.
+        ENDIF.
+
+    ENDWHILE.
+
+
+  endmethod.
+
+
+* <SIGNATURE>---------------------------------------------------------------------------------------+
+* | Static Public Method ZSTORE_OR_HAH=>ADD_NEW_ORDER
+* +-------------------------------------------------------------------------------------------------+
+* | [--->] IV_CLIENT_ID                   TYPE        ZA_CLIENT_ID_OR_HAH
+* | [--->] IV_PRODUCT_ID                  TYPE        ZA_PRODUCT_ID_OR_HAH
+* | [--->] IV_AMOUNT                      TYPE        ZA_QUANTITY_AMOUNT_OR_HAH
+* +--------------------------------------------------------------------------------------</SIGNATURE>
+  METHOD add_new_order.
+    DATA: ls_order TYPE zorders_or_hah,
+          ls_client TYPE zclients_or_hah,
+          ls_product TYPE zproducts_or_hah.
+
+
+*   check if the client and the product exist in both tables:
+*   if one of them does not exist, an error message will be displayed and the program will terminate.
+*****************        IMPORTANT: all messages have a HEBREW translation at the message class as well as English      ****************************
+    SELECT SINGLE * FROM zclients_or_hah AS client
+       WHERE client~client_id = @iv_client_id INTO @ls_client.
+
+
+    IF ls_client IS INITIAL. "if the client doesn't exist display an error.
+      MESSAGE A000(ZCL_MESSAGES_OR_HAH).
+    ENDIF.
+
+
+    SELECT SINGLE * FROM zproducts_or_hah AS product
+      WHERE product~product_id = @iv_product_id INTO @ls_product.
+
+      IF ls_product IS INITIAL. "if the product doesn't exist display an error.
+         MESSAGE A001(ZCL_MESSAGES_OR_HAH).
+      ENDIF.
+
+      IF ls_product-quantity_amount - iv_amount < 0. "if the quantity of the product in stock is lower
+        MESSAGE A002(ZCL_MESSAGES_OR_HAH).        "than the amount ordered, display an error.
+      ENDIF.
+
+      IF iv_amount < 1.                           "the purchased amount must be at least 1.
+        MESSAGE A003(ZCL_MESSAGES_OR_HAH).        "if not, an error will be displayed.
+      ENDIF.
+
+**********************  End of input check ***********************************************************************************************************
+
+
+*   check if the client already ordered this product before:
+    SELECT SINGLE * FROM zorders_or_hah AS order
+      WHERE order~client_id = @iv_client_id
+      AND order~product_id = @iv_product_id
+      INTO @ls_order.
+
+      IF ls_order IS INITIAL. " if the client didn't order the product before, add a new order.
+          ls_order-client_id = iv_client_id.
+          ls_order-product_id = iv_product_id.
+          ls_order-amount = iv_amount.
+          ls_order-order_date = sy-datum.
+          INSERT zorders_or_hah FROM ls_order.
+        ELSE.                 "if the client already ordered the product, update the existing order.
+        UPDATE zorders_or_hah
+        SET
+        amount = amount + iv_amount
+        order_date = sy-datum             "update the date to today's date.
+        WHERE client_id = iv_client_id
+        AND product_id = iv_product_id.
+      ENDIF.
+
+      UPDATE zproducts_or_hah             "update the product's remaining quantity amount after the purchase.
+      SET
+      quantity_amount = quantity_amount - iv_amount
+      WHERE product_id = iv_product_id.
+
+  ENDMETHOD.
+
+
+* <SIGNATURE>---------------------------------------------------------------------------------------+
+* | Static Public Method ZSTORE_OR_HAH=>ASSOCIATE_MULTI_CLIENT_ORDERS
+* +-------------------------------------------------------------------------------------------------+
+* | [--->] IT_CLIENT_ID_FILTER            TYPE        /IWBEP/T_COD_SELECT_OPTIONS(optional)
+* | [--->] IT_CLIENT_FULL_NAME_FILTER     TYPE        /IWBEP/T_COD_SELECT_OPTIONS(optional)
+* | [--->] IT_PHONE_NUMBER_FILTER         TYPE        /IWBEP/T_COD_SELECT_OPTIONS(optional)
+* | [<---] ET_CLIENTS_AND_ORDERS          TYPE        ZTT_ORDERS_OF_CLIENTS
+* +--------------------------------------------------------------------------------------</SIGNATURE>
+  method ASSOCIATE_MULTI_CLIENT_ORDERS.
+
+    DATA: lt_orders type STANDARD TABLE OF zorders_or_hah,
+*          ls_client_orders type zsa_orders_of_client,
+*          ls_order type zsa_order_or_hah,
+          lt_clients type STANDARD TABLE OF zclients_or_hah.
+
+CHECK it_client_id_filter is not INITIAL
+      OR it_client_full_name_filter is not INITIAL
+      OR it_phone_number_filter is not INITIAL.
+
+    SELECT * FROM zclients_or_hah
+      WHERE client_id IN @it_client_id_filter
+      AND  client_full_name IN @it_client_full_name_filter
+      AND  phone_number     IN @it_phone_number_filter
+      INTO CORRESPONDING FIELDS OF TABLE @et_clients_and_orders.
+
+CHECK et_clients_and_orders is not INITIAL.
+
+      SELECT * FROM zorders_or_hah
+        FOR ALL ENTRIES IN @et_clients_and_orders
+        WHERE client_id = @et_clients_and_orders-client_id
+      INTO CORRESPONDING FIELDS OF TABLE @lt_orders.
+
+
+*LOOP AT lt_orders INTO ls_order GROUP BY ls_order-client_id
+*  ASSIGNING FIELD-SYMBOL(<ls_grouped_clients_orders>).
+*
+*  LOOP AT GROUP <ls_grouped_clients_orders> INTO ls_order.
+*      append ls_order to ls_client_orders-orders.
+*    ENDLOOP.
+*
+*    READ TABLE et_clients_and_orders with key client_id = ls_order-client_id INTO ls_client_orders.
+*  append ls_client_orders to et_clients_and_orders.
+* ENDLOOP
+
+sort et_clients_and_orders by client_id.
+
+LOOP AT lt_orders ASSIGNING FIELD-SYMBOL(<ls_order>).
+
+  READ TABLE et_clients_and_orders with key client_id = <ls_order>-client_id BINARY SEARCH ASSIGNING FIELD-SYMBOL(<ls_client_orders>).
+
+  IF sy-subrc = 0.
+      APPEND <ls_order> to <ls_client_orders>-orders.
+  ENDIF.
+
+ENDLOOP.
+
+
+*SELECT * FROM zclients_or_hah
+*  WHERE client_id        IN @it_client_id_filter
+*    OR  client_full_name IN @it_client_full_name_filter
+*    OR  phone_number     IN @it_phone_number_filter
+*  INTO CORRESPONDING FIELDS OF TABLE @et_clients.
+
+*  SELECT * from zclients_or_hah
+*  WHERE client_id        IN @it_client_id_filter
+*    OR  client_full_name IN @it_client_full_name_filter
+*    OR  phone_number     IN @it_phone_number_filter ORDER BY client_id
+*    INTO CORRESPONDING FIELDS OF TABLE @lt_clients.
+*
+*
+*    SELECT * FROM zorders_or_hah
+*      WHERE client_id IN @it_client_id_filter ORDER BY client_id
+*      INTO CORRESPONDING FIELDS OF TABLE lt_orders.
+*
+*      LOOP AT lt_orders INTO ls_order GROUP BY ls_order-client_id
+*        ASSIGNING FIELD-SYMBOL(<ls_grouped_orders>).
+*
+*        LOOP AT GROUP <ls_grouped_orders> INTO ls_order.
+*
+
+  endmethod.
+
+
+* <SIGNATURE>---------------------------------------------------------------------------------------+
+* | Static Public Method ZSTORE_OR_HAH=>ASSOCIATE_ORDERS_FOR_CLIENT
+* +-------------------------------------------------------------------------------------------------+
+* | [--->] IV_CLIENT_ID                   TYPE        ZA_CLIENT_ID_OR_HAH
+* | [<---] ES_CLIENT_ORDERS               TYPE        ZSA_ORDERS_OF_CLIENT
+* +--------------------------------------------------------------------------------------</SIGNATURE>
+  method ASSOCIATE_ORDERS_FOR_CLIENT.
+    DATA: ls_client type zsa_client_or_hah.
+
+* Get the client's orders and assign them to the result's orders table:
+CALL METHOD zstore_or_hah=>get_orders_by_client_id
+  EXPORTING
+    iv_client_id = iv_client_id
+  IMPORTING
+    et_orders    = es_client_orders-orders
+    .
+
+
+* Get the client's details:
+CALL METHOD zstore_or_hah=>get_client_by_id
+  EXPORTING
+    iv_client_id = iv_client_id
+  IMPORTING
+    es_client    = ls_client
+    .
+
+*   Assign the client's details to the result strcture:
+MOVE-CORRESPONDING ls_client TO es_client_orders.
+
+  endmethod.
+
+
+* <SIGNATURE>---------------------------------------------------------------------------------------+
+* | Static Public Method ZSTORE_OR_HAH=>CALCULATE_2_NUMS
+* +-------------------------------------------------------------------------------------------------+
+* | [--->] IV_NUM1                        TYPE        I
+* | [--->] IV_NUM2                        TYPE        I
+* | [--->] IV_OP                          TYPE        STRING
+* | [<---] EV_RES                         TYPE        I
+* | [<---] EV_MESSAGE                     TYPE        STRING
+* +--------------------------------------------------------------------------------------</SIGNATURE>
+  METHOD CALCULATE_2_NUMS.
+
+    CASE iv_op.
+      WHEN '*'.
+        ev_res = iv_num1 * iv_num2.
+        ev_message = 'Success!'.
+      WHEN '='.                      "this is the '+' operator.
+        ev_res = iv_num1 + iv_num2.  " for some reason SAP converts the '+'(plus) input to 2000 hexadecimal
+        ev_message = 'Success!'.     " and it skips this condition, so i set it to '=' here.
+      WHEN '-'.
+        ev_res = iv_num1 - iv_num2.
+        ev_message = 'Success!'.
+      WHEN '/'.
+        ev_res = iv_num1 / iv_num2.
+        ev_message = 'Success!'.
+      WHEN OTHERS.
+        ev_message = 'Failure'.
+    ENDCASE.
+
+  ENDMETHOD.
+
+
+* <SIGNATURE>---------------------------------------------------------------------------------------+
+* | Static Public Method ZSTORE_OR_HAH=>DELETE_FROM_STORE_TABLE
+* +-------------------------------------------------------------------------------------------------+
+* | [--->] IS_CLIENT                      TYPE        ZSA_CLIENT_OR_HAH(optional)
+* | [--->] IS_PRODUCT                     TYPE        ZSA_PRODUCT_OR_HAH(optional)
+* | [--->] IS_ORDER                       TYPE        ZSA_ORDER_OR_HAH(optional)
+* | [--->] IT_CLIENT_TABLE                TYPE        ZTT_CLIENT_OR_HAH(optional)
+* | [--->] IT_PRODUCT_TABLE               TYPE        ZTT_PRODUCT_OR_HAH(optional)
+* | [--->] IT_ORDER_TABLE                 TYPE        ZTT_ORDER_OR_HAH(optional)
+* +--------------------------------------------------------------------------------------</SIGNATURE>
+  METHOD delete_from_store_table.
+
+IF it_client_table IS NOT INITIAL. "first see if the table contains values.
+    DELETE zclients_or_hah FROM TABLE it_client_table.
+ELSEIF is_client IS NOT INITIAL.   "If the table is empty, check if the structure has values.
+  DELETE zclients_or_hah FROM is_client. "NOTE: If both the table and the structure have values, only the table will be used.
+ENDIF.
+
+IF it_product_table IS NOT INITIAL.
+    DELETE zproducts_or_hah FROM TABLE it_product_table.
+ELSEIF is_product IS NOT INITIAL.
+  DELETE zproducts_or_hah FROM is_product.
+ENDIF.
+
+
+IF it_order_table IS NOT INITIAL.
+    DELETE zorders_or_hah FROM TABLE it_order_table.
+ELSEIF is_order IS NOT INITIAL.
+  DELETE zorders_or_hah FROM is_order.
+  UPDATE zproducts_or_hah                                 "when an order is deleted,
+  SET quantity_amount = quantity_amount + is_order-amount "the ordered amount is added to the product's stock.
+  WHERE product_id = is_order-product_id.                 "currently only works with the structure.
+ENDIF.
+
+  ENDMETHOD.
+
+
+* <SIGNATURE>---------------------------------------------------------------------------------------+
+* | Static Public Method ZSTORE_OR_HAH=>GET_ALL_CLIENTS
+* +-------------------------------------------------------------------------------------------------+
+* | [--->] IT_CLIENT_FULL_NAME_FILTER     TYPE        /IWBEP/T_COD_SELECT_OPTIONS(optional)
+* | [--->] IT_CLIENT_ID_FILTER            TYPE        /IWBEP/T_COD_SELECT_OPTIONS(optional)
+* | [--->] IT_PHONE_NUMBER_FILTER         TYPE        /IWBEP/T_COD_SELECT_OPTIONS(optional)
+* | [<---] ET_CLIENTS                     TYPE        ZTT_CLIENT_OR_HAH
+* +--------------------------------------------------------------------------------------</SIGNATURE>
+  method GET_ALL_CLIENTS.
+SELECT * FROM zclients_or_hah
+  WHERE client_id        IN @it_client_id_filter
+    OR  client_full_name IN @it_client_full_name_filter
+    OR  phone_number     IN @it_phone_number_filter
+  INTO CORRESPONDING FIELDS OF TABLE @et_clients.
+  endmethod.
+
+
+* <SIGNATURE>---------------------------------------------------------------------------------------+
+* | Static Public Method ZSTORE_OR_HAH=>GET_ALL_ORDERS
+* +-------------------------------------------------------------------------------------------------+
+* | [--->] IT_CLIENT_ID_FILTER            TYPE        /IWBEP/T_COD_SELECT_OPTIONS(optional)
+* | [--->] IT_PRODUCT_ID_FILTER           TYPE        /IWBEP/T_COD_SELECT_OPTIONS(optional)
+* | [--->] IT_AMOUNT_FILTER               TYPE        /IWBEP/T_COD_SELECT_OPTIONS(optional)
+* | [--->] IT_ORDER_DATE_FILTER           TYPE        /IWBEP/T_COD_SELECT_OPTIONS(optional)
+* | [<---] ET_ORDERS                      TYPE        ZTT_ORDER_OR_HAH
+* +--------------------------------------------------------------------------------------</SIGNATURE>
+  method GET_ALL_ORDERS.
+    SELECT * FROM zorders_or_hah
+      WHERE client_id IN @it_client_id_filter
+      AND product_id IN @it_product_id_filter
+      AND amount IN @it_amount_filter
+      AND order_date IN @it_order_date_filter
+      INTO CORRESPONDING FIELDS OF TABLE @et_orders.
+  endmethod.
+
+
+* <SIGNATURE>---------------------------------------------------------------------------------------+
+* | Static Public Method ZSTORE_OR_HAH=>GET_ALL_PRODUCTS
+* +-------------------------------------------------------------------------------------------------+
+* | [--->] IT_PRODUCT_ID_FILTER           TYPE        /IWBEP/T_COD_SELECT_OPTIONS(optional)
+* | [--->] IT_PRODUCT_NAME_FILTER         TYPE        /IWBEP/T_COD_SELECT_OPTIONS(optional)
+* | [--->] IT_PRODUCT_PRICE_FILTER        TYPE        /IWBEP/T_COD_SELECT_OPTIONS(optional)
+* | [--->] IT_QUANTITY_AMOUNT_FILTER      TYPE        /IWBEP/T_COD_SELECT_OPTIONS(optional)
+* | [<---] ET_PRODUCTS                    TYPE        ZTT_PRODUCT_OR_HAH
+* +--------------------------------------------------------------------------------------</SIGNATURE>
+  method GET_ALL_PRODUCTS.
+    SELECT * FROM zproducts_or_hah
+      WHERE product_id IN @it_product_id_filter
+      AND product_name IN @it_product_name_filter
+      AND product_price IN @it_product_price_filter
+      AND quantity_amount IN @it_quantity_amount_filter
+      INTO CORRESPONDING FIELDS OF TABLE @et_products.
+  endmethod.
+
+
+* <SIGNATURE>---------------------------------------------------------------------------------------+
+* | Static Public Method ZSTORE_OR_HAH=>GET_BUYERS_AND_COSTS
+* +-------------------------------------------------------------------------------------------------+
+* | [<---] ET_RESULT                      TYPE        ZTT_TOTAL_COST_CALC
+* +--------------------------------------------------------------------------------------</SIGNATURE>
+  METHOD get_buyers_and_costs.
+
+    TYPES: BEGIN OF cost_and_amount_table,
+            client_id TYPE za_client_id_or_hah,
+            prodcut_price TYPE za_product_price_or_hah,
+            amount  TYPE za_quantity_amount_or_hah,
+           END OF cost_and_amount_table.
+
+
+    DATA:
+          ls_order_and_amount TYPE cost_and_amount_table,
+          lt_cost_holder  TYPE STANDARD TABLE OF cost_and_amount_table,
+          lv_total_cost TYPE i VALUE 0,
+          ls_total_calc TYPE zsa_total_cost_calc.
+
+
+*   Get the clients who ordered, prices of products and amount per order from the tables and put them in a local table.
+    SELECT orders~client_id, products~product_price, orders~amount FROM zorders_or_hah AS orders
+      INNER JOIN zproducts_or_hah AS products ON orders~product_id = products~product_id INTO TABLE @lt_cost_holder ORDER BY orders~client_id.
+
+* Calculate the cost per client.
+LOOP AT lt_cost_holder INTO ls_order_and_amount GROUP BY ls_order_and_amount-client_id
+  ASSIGNING FIELD-SYMBOL(<ls_grouped_orders>).
+
+      LOOP AT GROUP <ls_grouped_orders> INTO ls_order_and_amount.
+        lv_total_cost = lv_total_cost + ls_order_and_amount-prodcut_price * ls_order_and_amount-amount.
+    ENDLOOP.
+
+   SELECT SINGLE client~client_full_name FROM zclients_or_hah AS client
+   WHERE client~client_id = @ls_order_and_amount-client_id INTO @ls_total_calc-client_full_name.
+   ls_total_calc-total_cost = CONV string( lv_total_cost ).
+   APPEND ls_total_calc TO et_result.
+
+   lv_total_cost = 0.
+
+ENDLOOP.
+
+IF 1 = 1.
+
+ENDIF.
+
+  ENDMETHOD.
+
+
+* <SIGNATURE>---------------------------------------------------------------------------------------+
+* | Static Public Method ZSTORE_OR_HAH=>GET_CLIENTS_BY_PHONE
+* +-------------------------------------------------------------------------------------------------+
+* | [<---] ET_CLIENTS                     TYPE        ZTT_CLIENT_OR_HAH
+* +--------------------------------------------------------------------------------------</SIGNATURE>
+  method GET_CLIENTS_BY_PHONE.
+
+    SELECT * FROM zclients_or_hah as clients
+      where clients~phone_number LIKE '052%'
+      INTO TABLE @ET_CLIENTS.
+
+  endmethod.
+
+
+* <SIGNATURE>---------------------------------------------------------------------------------------+
+* | Static Public Method ZSTORE_OR_HAH=>GET_CLIENTS_WHO_ORDERED
+* +-------------------------------------------------------------------------------------------------+
+* | [<---] ET_ORDERING_CLIENTS            TYPE        ZTT_CLIENT_OR_HAH
+* +--------------------------------------------------------------------------------------</SIGNATURE>
+  method GET_CLIENTS_WHO_ORDERED.
+    SELECT clients~client_full_name, clients~phone_number FROM ZCLIENTS_OR_HAH as clients
+      INNER JOIN ZORDERS_OR_HAH as orders
+      ON clients~client_id = orders~client_id
+      INTO CORRESPONDING FIELDS OF TABLE @ET_ORDERING_CLIENTS.
+  endmethod.
+
+
+* <SIGNATURE>---------------------------------------------------------------------------------------+
+* | Static Public Method ZSTORE_OR_HAH=>GET_CLIENT_BY_ID
+* +-------------------------------------------------------------------------------------------------+
+* | [--->] IV_CLIENT_ID                   TYPE        ZA_CLIENT_ID_OR_HAH
+* | [<---] ES_CLIENT                      TYPE        ZSA_CLIENT_OR_HAH
+* +--------------------------------------------------------------------------------------</SIGNATURE>
+  method GET_CLIENT_BY_ID.
+
+SELECT SINGLE *
+  FROM zclients_or_hah
+  WHERE client_id = @iv_client_id
+  INTO CORRESPONDING FIELDS OF @es_client.
+
+  endmethod.
+
+
+* <SIGNATURE>---------------------------------------------------------------------------------------+
+* | Static Public Method ZSTORE_OR_HAH=>GET_ORDERS_BY_CLIENT_ID
+* +-------------------------------------------------------------------------------------------------+
+* | [--->] IV_CLIENT_ID                   TYPE        ZA_CLIENT_ID_OR_HAH
+* | [<---] ET_ORDERS                      TYPE        ZTT_ORDER_OR_HAH
+* +--------------------------------------------------------------------------------------</SIGNATURE>
+  method GET_ORDERS_BY_CLIENT_ID.
+    SELECT * FROM zorders_or_hah
+      WHERE client_id = @iv_client_id
+      INTO CORRESPONDING FIELDS OF TABLE @et_orders.
+  endmethod.
+
+
+* <SIGNATURE>---------------------------------------------------------------------------------------+
+* | Static Public Method ZSTORE_OR_HAH=>GET_ORDER_OF_CLIENT
+* +-------------------------------------------------------------------------------------------------+
+* | [--->] IV_CLIENT_ID                   TYPE        ZA_CLIENT_ID_OR_HAH
+* | [--->] IV_PRODUCT_ID                  TYPE        ZA_PRODUCT_ID_OR_HAH
+* | [<---] ES_ORDER                       TYPE        ZSA_ORDER_OR_HAH
+* +--------------------------------------------------------------------------------------</SIGNATURE>
+  method GET_ORDER_OF_CLIENT.
+
+    SELECT SINGLE * FROM zorders_or_hah
+      WHERE client_id = @iv_client_id and product_id = @iv_product_id
+      INTO @es_order.
+  endmethod.
+
+
+* <SIGNATURE>---------------------------------------------------------------------------------------+
+* | Static Public Method ZSTORE_OR_HAH=>GET_PRODUCT_BY_ID
+* +-------------------------------------------------------------------------------------------------+
+* | [--->] IV_PRODUCT_ID                  TYPE        ZA_PRODUCT_ID_OR_HAH
+* | [<---] ES_PRODUCT                     TYPE        ZSA_PRODUCT_OR_HAH
+* +--------------------------------------------------------------------------------------</SIGNATURE>
+  method GET_PRODUCT_BY_ID.
+
+    SELECT SINGLE * FROM zproducts_or_hah
+      WHERE product_id = @iv_product_id
+      INTO @es_product.
+  endmethod.
+
+
+* <SIGNATURE>---------------------------------------------------------------------------------------+
+* | Static Public Method ZSTORE_OR_HAH=>INSERT_TO_STORE_TABLE
+* +-------------------------------------------------------------------------------------------------+
+* | [--->] IS_CLIENT                      TYPE        ZSA_CLIENT_OR_HAH(optional)
+* | [--->] IS_PRODUCT                     TYPE        ZSA_PRODUCT_OR_HAH(optional)
+* | [--->] IS_ORDER                       TYPE        ZSA_ORDER_OR_HAH(optional)
+* | [--->] IT_CLIENT_TABLE                TYPE        ZTT_CLIENT_OR_HAH(optional)
+* | [--->] IT_PRODUCT_TABLE               TYPE        ZTT_PRODUCT_OR_HAH(optional)
+* | [--->] IT_ORDER_TABLE                 TYPE        ZTT_ORDER_OR_HAH(optional)
+* +--------------------------------------------------------------------------------------</SIGNATURE>
+  METHOD insert_to_store_table.
+
+    IF it_client_table IS NOT INITIAL. "first see if the table contains values.
+      INSERT zclients_or_hah FROM TABLE it_client_table.
+    ELSEIF is_client IS NOT INITIAL.   "If the table is empty, check if the structure has values.
+      INSERT zclients_or_hah FROM is_client. "NOTE: If both the table and the structure have values, only the table will be used.
+    ENDIF.
+
+
+    IF it_product_table IS NOT INITIAL.
+      INSERT zproducts_or_hah FROM TABLE it_product_table.
+    ELSEIF is_product IS NOT INITIAL.
+      INSERT zproducts_or_hah FROM is_product.
+    ENDIF.
+
+
+    IF it_order_table IS NOT INITIAL.
+      INSERT zorders_or_hah FROM TABLE it_order_table.
+    ELSEIF is_order IS NOT INITIAL.
+      INSERT zorders_or_hah FROM is_order.
+    ENDIF.
+
+  ENDMETHOD.
+
+
+* <SIGNATURE>---------------------------------------------------------------------------------------+
+* | Static Public Method ZSTORE_OR_HAH=>UPDATE_STORE_TABLE
+* +-------------------------------------------------------------------------------------------------+
+* | [--->] IS_CLIENT                      TYPE        ZSA_CLIENT_OR_HAH(optional)
+* | [--->] IS_PRODUCT                     TYPE        ZSA_PRODUCT_OR_HAH(optional)
+* | [--->] IS_ORDER                       TYPE        ZSA_ORDER_OR_HAH(optional)
+* | [--->] IT_CLIENT_TABLE                TYPE        ZTT_CLIENT_OR_HAH(optional)
+* | [--->] IT_PRODUCT_TABLE               TYPE        ZTT_PRODUCT_OR_HAH(optional)
+* | [--->] IT_ORDER_TABLE                 TYPE        ZTT_ORDER_OR_HAH(optional)
+* +--------------------------------------------------------------------------------------</SIGNATURE>
+  METHOD update_store_table.
+
+IF it_client_table IS NOT INITIAL. "first see if the table contains values.
+    UPDATE zclients_or_hah FROM TABLE it_client_table.
+ELSEIF is_client IS NOT INITIAL.   "If the table is empty, check if the structure has values.
+  UPDATE zclients_or_hah FROM is_client. "NOTE: If both the table and the structure have values, only the table will be used.
+ENDIF.
+
+
+IF it_product_table IS NOT INITIAL.
+    UPDATE zproducts_or_hah FROM TABLE it_product_table.
+ELSEIF is_product IS NOT INITIAL.
+  UPDATE zproducts_or_hah FROM is_product.
+ENDIF.
+
+IF it_order_table IS NOT INITIAL.
+    UPDATE zorders_or_hah FROM TABLE it_order_table.
+ELSEIF is_order IS NOT INITIAL.
+  UPDATE zorders_or_hah FROM is_order.
+ENDIF.
+
+  ENDMETHOD.
+ENDCLASS.

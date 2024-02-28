@@ -1,0 +1,35 @@
+  METHOD clientset_get_entityset.
+    DATA: lt_filter                  TYPE /iwbep/t_mgw_select_option,
+          lt_client_full_name_filter TYPE /iwbep/t_cod_select_options,
+          lt_client_id_filter        TYPE /iwbep/t_cod_select_options,
+          lt_phone_number_filter     TYPE /iwbep/t_cod_select_options.
+
+    DATA(lo_filter) = io_tech_request_context->get_filter( ).
+    lt_filter = lo_filter->get_filter_select_options( ).
+
+    LOOP AT lt_filter ASSIGNING FIELD-SYMBOL(<ls_filter>).
+      CASE <ls_filter>-property.
+        WHEN 'CLIENT_FULL_NAME'.
+          lt_client_full_name_filter = <ls_filter>-select_options.
+        WHEN 'CLIENT_ID'.
+          lt_client_id_filter = <ls_filter>-select_options.
+        WHEN 'PHONE_NUMBER'.
+          lt_phone_number_filter = <ls_filter>-select_options.
+      ENDCASE.
+    ENDLOOP.
+
+    CHECK lt_client_full_name_filter is not initial
+    or lt_phone_number_filter is not initial
+    or lt_client_id_filter is not initial.
+
+CALL METHOD zstore_or_hah=>get_all_clients
+  EXPORTING
+    it_client_full_name_filter =   lt_client_full_name_filter   " MGW Framework: Select Options for Queries
+    it_client_id_filter        =   lt_client_id_filter  " MGW Framework: Select Options for Queries
+    it_phone_number_filter     =   lt_phone_number_filter  " MGW Framework: Select Options for Queries
+
+  IMPORTING
+    et_clients = et_entityset
+    .
+
+  ENDMETHOD.

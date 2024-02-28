@@ -1,0 +1,24 @@
+  method CLIENTSET_GET_ENTITY.
+
+    DATA: lv_client_id type za_client_id_or_hah,
+          lv_order type string.
+
+DATA(lt_keys) = io_tech_request_context->get_keys( ).
+
+LOOP AT lt_keys ASSIGNING FIELD-SYMBOL(<ls_key>).
+  CASE <ls_key>-name.
+    WHEN 'CLIENT_ID'.                     "SAP converts it to capital letters so we check for capital letters.
+      lv_client_id = <ls_key>-value.
+    WHEN 'ORDER'.                     " we include checking for orders of the client so we can get each order for each client.
+      lv_order = <ls_key>-value.        " otherwise we could get only one order for each client.
+  ENDCASE.
+ENDLOOP.
+
+CALL METHOD zstore_or_hah=>get_client_by_id
+  EXPORTING
+    iv_client_id = lv_client_id
+  IMPORTING
+    es_client    = er_entity
+    .
+
+  endmethod.

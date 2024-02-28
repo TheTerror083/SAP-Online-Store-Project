@@ -1,0 +1,20 @@
+  method PRODUCTSET_GET_ENTITY.
+    DATA: lv_prdouct_id type za_product_id_or_hah.
+
+DATA(lt_keys) = io_tech_request_context->get_keys( ).
+
+LOOP AT lt_keys ASSIGNING FIELD-SYMBOL(<ls_key>).
+  CASE <ls_key>-name.
+    WHEN 'PRODUCT_ID'.
+      lv_prdouct_id = <ls_key>-value.
+  ENDCASE.
+ENDLOOP.
+
+CALL METHOD zstore_or_hah=>get_product_by_id
+  EXPORTING
+    iv_product_id = lv_prdouct_id
+  IMPORTING
+    es_product    = er_entity
+    .
+
+  endmethod.

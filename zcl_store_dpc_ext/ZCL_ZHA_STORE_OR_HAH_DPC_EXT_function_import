@@ -1,0 +1,43 @@
+  method /IWBEP/IF_MGW_APPL_SRV_RUNTIME~EXECUTE_ACTION.
+    "NOTE: there can be only one action name per call.
+    DATA: lt_params type /IWBEP/T_MGW_NAME_VALUE_PAIR,
+          lv_num1 type i,
+          lv_num2 type i,
+          lv_operator type string,
+          lv_res type i,
+          lv_message type string.
+
+   lt_params = io_tech_request_context->get_parameters( ).
+
+      LOOP AT lt_params ASSIGNING FIELD-SYMBOL(<ls_param>).
+        CASE <ls_param>-name.
+          WHEN 'OPERATOR'.
+            lv_operator = <ls_param>-value.
+          WHEN 'NUM1'.
+            lv_num1 = <ls_param>-value.
+          WHEN 'NUM2'.
+            lv_num2 = <ls_param>-value.
+        ENDCASE.
+      ENDLOOP.
+
+    CASE iv_action_name.
+      WHEN 'Calculate'.
+
+      CALL METHOD zstore_or_hah=>calculate_2_nums
+        EXPORTING
+          iv_num1    = lv_num1
+          iv_num2    = lv_num2
+          iv_op      = lv_operator
+        IMPORTING
+          ev_res     = lv_res
+          ev_message = lv_message
+          .
+
+*     er_data is a generic type and needs to be defined. it can be anything we want. that's why we need to set it as 'NEW'
+*     here we define it as our COMPLEX TYPE multResult, since we want to return it when we execute the imported function "Multiply".
+*     otherwise nothing will be returned to the client.
+      er_data = NEW zcl_zha_store_or_hah_mpc=>calcResult( CALC_RES = lv_res CALC_MESSAGE = lv_message ).
+
+    ENDCASE.
+
+  endmethod.

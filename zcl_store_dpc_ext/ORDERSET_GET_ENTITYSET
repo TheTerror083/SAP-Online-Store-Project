@@ -1,0 +1,29 @@
+  method ORDERSET_GET_ENTITYSET.
+    DATA: lt_filter                   TYPE /iwbep/t_mgw_select_option,
+          lt_client_id_filter         TYPE /iwbep/t_cod_select_options,
+          lt_product_id_filter        TYPE /iwbep/t_cod_select_options,
+          lt_amount_filter            TYPE /iwbep/t_cod_select_options,
+          lt_order_date_filter              TYPE /iwbep/t_cod_select_options.
+
+    DATA(lo_filter) = io_tech_request_context->get_filter( ).
+    lt_filter = lo_filter->get_filter_select_options( ).
+
+    LOOP AT lt_filter ASSIGNING FIELD-SYMBOL(<ls_filter>).
+      CASE <ls_filter>-property.
+        WHEN 'CLIENT_ID'.
+          lt_client_id_filter = <ls_filter>-select_options.
+        WHEN 'PRODUCT_ID'.
+          lt_product_id_filter = <ls_filter>-select_options.
+        WHEN 'AMOUNT'.
+          lt_amount_filter = <ls_filter>-select_options.
+        WHEN 'ORDER_DATE'.
+          lt_order_date_filter = <ls_filter>-select_options.
+      ENDCASE.
+    ENDLOOP.
+
+CALL METHOD zstore_or_hah=>get_all_orders
+  IMPORTING
+    et_orders = et_entityset
+    .
+
+  endmethod.

@@ -1,0 +1,32 @@
+  method CLIENTSET_DELETE_ENTITY.
+
+* DO NOT USE YET, WAIT TO SEE IF THIS IS NEEDED IN THE PROJECT!
+
+    DATA: lv_client_id  type za_client_id_or_hah,
+          ls_client     type zcl_zha_store_or_hah_mpc_ext=>ts_client.
+
+
+    DATA(lt_keys) = io_tech_request_context->get_keys( ).
+
+    LOOP AT lt_keys ASSIGNING FIELD-SYMBOL(<ls_key>).
+      CASE <ls_key>-name.
+        WHEN 'CLIENT_ID'.
+          lv_client_id = <ls_key>-value.
+      ENDCASE.
+    ENDLOOP.
+
+    CALL METHOD zstore_or_hah=>get_client_by_id
+      EXPORTING
+        iv_client_id = lv_client_id
+      IMPORTING
+        es_client    = ls_client
+        .
+
+    CALL METHOD zstore_or_hah=>delete_from_store_table
+      EXPORTING
+        is_client        =     ls_client
+*        it_client_table  =
+      .
+
+
+  endmethod.

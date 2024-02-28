@@ -1,0 +1,35 @@
+  method /IWBEP/IF_MGW_APPL_SRV_RUNTIME~GET_EXPANDED_ENTITY.
+
+
+    DATA: lv_client_id type za_client_id_or_hah,
+          ls_result type zstore_or_hah=>zsa_orders_of_client.
+
+  DATA(lt_keys) = io_tech_request_context->get_keys( ).
+
+
+LOOP AT lt_keys ASSIGNING FIELD-SYMBOL(<ls_key>).
+  CASE <ls_key>-name.
+    WHEN 'CLIENT_ID'.
+      lv_client_id = <ls_key>-value.
+    ENDCASE.
+ENDLOOP.
+
+CASE iv_entity_name.
+  WHEN zcl_zha_store_or_hah_mpc=>gc_client.
+
+CALL METHOD zstore_or_hah=>associate_orders_for_client
+  EXPORTING
+    iv_client_id     = lv_client_id
+  IMPORTING
+    es_client_orders = ls_result
+    .
+
+     copy_data_to_ref(
+       EXPORTING
+         is_data = ls_result
+       CHANGING
+         cr_data = er_entity
+     ).
+ENDCASE.
+
+  endmethod.
